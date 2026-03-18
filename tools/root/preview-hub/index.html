@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Joint — Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f1412;
+      color: #e8edea;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: #1a221e;
+      border: 1px solid #2d3b34;
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 { font-size: 1.25rem; margin-bottom: 1.25rem; font-weight: 600; }
+    .links { display: flex; flex-direction: column; gap: 0.75rem; }
+    a.preview-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      min-height: 48px;
+      border-radius: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      color: #0f1412;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    a.preview-link:hover { opacity: 0.9; }
+    a.preview-link.unavailable { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+    a.website { background: #5b9bd5; }
+    a.app { background: #b8926a; }
+    .status { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status.checking { color: rgba(0,0,0,0.5); }
+    .status.ready { color: rgba(0,0,0,0.8); }
+    .status.unavailable { color: rgba(0,0,0,0.6); }
+    .hint { margin-top: 1.25rem; font-size: 0.8rem; color: #6b7f73; line-height: 1.5; }
+    .hint code { background: #2d3b34; padding: 0.15em 0.4em; border-radius: 4px; }
+    .all-unavailable { margin-top: 1rem; padding: 0.75rem; background: #2d3b34; border-radius: 8px; font-size: 0.8rem; color: #9ca89f; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>The Joint</h1>
+    <div class="links">
+      <a href="http://localhost:4000" target="_blank" rel="noopener" class="preview-link website" id="link-website">
+        <span>Website</span>
+        <span class="status checking" id="status-website">Checking…</span>
+      </a>
+      <a href="http://localhost:4001" target="_blank" rel="noopener" class="preview-link app" id="link-app">
+        <span>App</span>
+        <span class="status checking" id="status-app">Checking…</span>
+      </a>
+    </div>
+    <div class="all-unavailable" id="help-unavailable" style="display:none">
+      Keep the preview windows open. Run <code>preview.bat</code> or <code>npm run preview:all</code> from repo root.
+    </div>
+    <p class="hint">From repo root: <code>npm run start:website</code> (4000), <code>npm run start:app</code> (4001).</p>
+  </div>
+  <script>
+    (function() {
+      var urls = [
+        { id: 'website', url: 'http://localhost:4000/icon.svg' },
+        { id: 'app', url: 'http://localhost:4001/favicon.svg' }
+      ];
+      function check(probeUrl, id) {
+        var link = document.getElementById('link-' + id);
+        var status = document.getElementById('status-' + id);
+        var img = new Image();
+        img.onload = function() {
+          status.textContent = 'Ready';
+          status.className = 'status ready';
+          link.classList.remove('unavailable');
+        };
+        img.onerror = function() {
+          status.textContent = 'Unavailable';
+          status.className = 'status unavailable';
+          link.classList.add('unavailable');
+        };
+        img.src = probeUrl + '?t=' + Date.now();
+      }
+      urls.forEach(function(u) { check(u.url, u.id); });
+      setInterval(function() {
+        urls.forEach(function(u) {
+          var status = document.getElementById('status-' + u.id);
+          if (status.textContent === 'Unavailable') check(u.url, u.id);
+        });
+      }, 5000);
+      setTimeout(function() {
+        var anyReady = urls.some(function(u) {
+          return document.getElementById('status-' + u.id).textContent === 'Ready';
+        });
+        var help = document.getElementById('help-unavailable');
+        if (!anyReady && help) help.style.display = 'block';
+      }, 8000);
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Joint — Local preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: #0d1110;
+      color: #e6ebe8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+    .hub {
+      background: #161c1a;
+      border: 1px solid #2a3530;
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem; }
+    .tagline { font-size: 0.875rem; color: #7a8a82; margin-bottom: 1.75rem; }
+    .links { display: flex; flex-direction: column; gap: 0.75rem; }
+    .hub a {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      font-weight: 500;
+      text-decoration: none;
+      color: #0d1110;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .hub a:hover { opacity: 0.95; transform: translateY(-1px); }
+    .hub a.unavailable { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+    .hub a.website { background: #4a9fd4; }
+    .hub a.app { background: #a67c52; }
+    .status { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .status.checking { color: rgba(0,0,0,0.5); }
+    .status.ready { color: rgba(0,0,0,0.8); }
+    .status.unavailable { color: rgba(0,0,0,0.6); }
+    .note { margin-top: 1.5rem; font-size: 0.75rem; color: #5c6b63; line-height: 1.5; }
+    .note code { background: #2a3530; padding: 0.1em 0.35em; border-radius: 4px; }
+    .all-unavailable { margin-top: 1rem; padding: 0.75rem; background: #2a3530; border-radius: 8px; font-size: 0.8rem; color: #9ca89f; }
+  </style>
+</head>
+<body>
+  <div class="hub">
+    <h1>The Joint</h1>
+    <p class="tagline">Local preview — open site and app</p>
+    <div class="links">
+      <a href="http://localhost:4000" target="_blank" rel="noopener" class="website" id="link-website">
+        <span>Website → localhost:4000</span>
+        <span class="status checking" id="status-website">Checking…</span>
+      </a>
+      <a href="http://localhost:4001" target="_blank" rel="noopener" class="app" id="link-app">
+        <span>Order app → localhost:4001</span>
+        <span class="status checking" id="status-app">Checking…</span>
+      </a>
+    </div>
+    <div class="all-unavailable" id="help-unavailable" style="display:none">
+      Keep the preview windows open. Run <code>preview.bat</code> or <code>npm run preview:all</code> from repo root.
+    </div>
+    <p class="note">If a link fails, the dev server may still be starting. Keep the terminal (and any extra windows) open.</p>
+  </div>
+  <script>
+    (function() {
+      var urls = [
+        { id: 'website', url: 'http://localhost:4000/icon.svg' },
+        { id: 'app', url: 'http://localhost:4001/favicon.svg' }
+      ];
+      function check(probeUrl, id) {
+        var link = document.getElementById('link-' + id);
+        var status = document.getElementById('status-' + id);
+        var img = new Image();
+        img.onload = function() {
+          status.textContent = 'Ready';
+          status.className = 'status ready';
+          link.classList.remove('unavailable');
+        };
+        img.onerror = function() {
+          status.textContent = 'Unavailable';
+          status.className = 'status unavailable';
+          link.classList.add('unavailable');
+        };
+        img.src = probeUrl + '?t=' + Date.now();
+      }
+      urls.forEach(function(u) { check(u.url, u.id); });
+      setInterval(function() {
+        urls.forEach(function(u) {
+          var status = document.getElementById('status-' + u.id);
+          if (status.textContent === 'Unavailable') check(u.url, u.id);
+        });
+      }, 5000);
+      setTimeout(function() {
+        var anyReady = urls.some(function(u) {
+          return document.getElementById('status-' + u.id).textContent === 'Ready';
+        });
+        var help = document.getElementById('help-unavailable');
+        if (!anyReady && help) help.style.display = 'block';
+      }, 8000);
+    })();
+  </script>
+</body>
+</html>

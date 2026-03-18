@@ -1,0 +1,13 @@
+# Netlify — marketing site (Next.js 14)
+# This lives at repo root so Netlify always picks it up.
+
+[build]
+  base = "website"
+  command = "npm run build"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_VERSION = "20"
+

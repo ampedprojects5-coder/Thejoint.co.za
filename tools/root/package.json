@@ -1,0 +1,23 @@
+{
+  "name": "the-joint-root",
+  "private": true,
+  "scripts": {
+    "check:publish": "node scripts/check-no-lorem.js",
+    "preview": "node scripts/serve-preview.js",
+    "preview:all": "node scripts/start-all-preview.js",
+    "preview:website": "npm run dev --prefix website",
+    "preview:app": "npm run dev:app --prefix app",
+    "preview:hub": "node scripts/serve-preview-hub.js",
+    "new:website": "npm run dev:new --prefix website",
+    "new:app": "npm run dev:new --prefix app/apps/app",
+    "start:website": "node scripts/run-preview.js website",
+    "start:app": "node scripts/start-app-local.js",
+    "app": "node scripts/start-app-local.js",
+    "preview:app:customer": "node scripts/start-app-local.js",
+    "preview:app:owner": "node scripts/start-app-local.js owner",
+    "preview:app:both": "node scripts/start-app-local.js both",
+    "start:preview": "node scripts/start-all-preview.js",
+    "preview:local": "node scripts/preview-local.js",
+    "diagnose:app": "node scripts/diagnose-app.js"
+  }
+}
